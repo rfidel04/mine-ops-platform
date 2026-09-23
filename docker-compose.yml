@@ -1,0 +1,31 @@
+services:
+  historian:
+    image: timescale/timescaledb:latest-pg16
+    environment:
+      POSTGRES_USER: mine
+      POSTGRES_PASSWORD: mine
+      POSTGRES_DB: plant
+    ports: ["5432:5432"]
+    volumes: [historian-data:/var/lib/postgresql/data]
+
+  grafana:
+    image: grafana/grafana-oss:latest
+    ports: ["3000:3000"]
+    depends_on: [historian]
+
+  ignition:
+    image: inductiveautomation/ignition:8.3
+    ports: ["8088:8088"]
+    environment:
+      ACCEPT_IGNITION_EULA: "Y"
+      GATEWAY_ADMIN_USERNAME: admin
+      GATEWAY_ADMIN_PASSWORD: changeme
+      IGNITION_EDITION: maker
+      # Maker needs these two. You get them free after registering on inductiveautomation.com:
+      # IGNITION_LICENSE_KEY: "xxxx-xxxx"
+      # IGNITION_ACTIVATION_TOKEN: "..."
+    volumes: [ignition-data:/usr/local/bin/ignition/data]
+
+volumes:
+  historian-data:
+  ignition-data:
